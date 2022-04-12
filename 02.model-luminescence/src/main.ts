@@ -33,10 +33,7 @@ const bloomParams = {
   bloomThreshold: 0.0,
 };
 
-async function main() {
-  // DOMを取得
-  const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
-
+async function main(element: HTMLElement) {
   // モデルをロード
   const model = await ThreeUtils.loadGltf(`static/PrimaryIonDrive.glb`);
 
@@ -64,7 +61,7 @@ async function main() {
   // カメラのセットアップ
   const camera = new THREE.PerspectiveCamera(
     50,
-    appElement.clientWidth / appElement.clientHeight,
+    element.clientWidth / element.clientHeight,
     0.01,
     1000
   );
@@ -77,7 +74,7 @@ async function main() {
 
   // レンダラーのセットアップ
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(appElement.clientWidth, appElement.clientHeight);
+  renderer.setSize(element.clientWidth, element.clientHeight);
   renderer.setClearColor(0x000000); // 背景色
   renderer.shadowMap.enabled = true; // レンダラー：シャドウを有効にする
   renderer.toneMapping = THREE.ReinhardToneMapping;
@@ -88,7 +85,7 @@ async function main() {
 
   // エフェクト: 発光エフェクト
   const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(appElement.clientWidth, appElement.clientHeight),
+    new THREE.Vector2(element.clientWidth, element.clientHeight),
     bloomParams.bloomStrength,
     bloomParams.bloomRadius,
     bloomParams.bloomThreshold,
@@ -98,7 +95,7 @@ async function main() {
   const effectComposer = new EffectComposer(renderer);
   effectComposer.addPass(renderPass);
   effectComposer.addPass(bloomPass);
-  effectComposer.setSize(appElement.clientWidth, appElement.clientHeight);
+  effectComposer.setSize(element.clientWidth, element.clientHeight);
 
   // カメラコントローラーのセットアップ
   const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -109,7 +106,7 @@ async function main() {
   orbitControls.autoRotateSpeed = 1.0; // カメラの自動回転速度
 
   // DOMに追加
-  appElement.appendChild(renderer.domElement);
+  element.appendChild(renderer.domElement);
 
   // 最終更新時間
   let lastTime = 0;
@@ -147,4 +144,7 @@ async function main() {
   }
 }
 
-main();
+// DOMを取得
+const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
+
+main(appElement);
