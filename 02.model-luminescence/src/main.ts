@@ -111,29 +111,40 @@ async function main() {
   // DOMに追加
   appElement.appendChild(renderer.domElement);
 
+  // 最終更新時間
   let lastTime = 0;
 
-  function animate(time: number = 0) {
-    requestAnimationFrame(time => animate(time));
-
-    if (lastTime !== undefined) {
-      const delta = (time - lastTime) / 1000;
-
-      // 
-      mixer.update(delta);
-
-      // カメラコントローラーを更新
-      orbitControls.update();
-    }
-
+  // リフレッシュレートに応じて呼び出しをリクエスト
+  requestAnimationFrame(time => {
+    // 最終更新時間を設定
     lastTime = time;
 
-    // 描画する
-    effectComposer.render(time);
-  }
+    // アニメーションを開始
+    animate(time);
+  });
 
-  // アニメーションを開始
-  animate();
+  /**
+   * フレーム描画処理
+   */
+  function animate(time: number) {
+    // リフレッシュレートに応じて呼び出しをリクエスト
+    requestAnimationFrame(time => animate(time));
+
+    // 経過時間を算出
+    const delta = (time - lastTime) / 1000;
+
+    // アニメーションミキサーを更新
+    mixer.update(delta);
+
+    // カメラコントローラーを更新
+    orbitControls.update();
+
+    // シーンを描画する
+    effectComposer.render(time);
+
+    // 最終更新時間を設定
+    lastTime = time;
+  }
 }
 
 main();
