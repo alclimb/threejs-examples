@@ -1,7 +1,10 @@
 {
     "name": "text-2d",
     "version": "1.0.0",
-    "scripts": {},
+    "scripts": {
+      "dev": "vite",
+      "build": "tsc && vite build"
+    },
     "author": "",
     "description": "",
     "dependencies": {
