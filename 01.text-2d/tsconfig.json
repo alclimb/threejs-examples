@@ -1,32 +1,19 @@
 {
-    "compilerOptions": {
-        "target": "es2015",
-        "module": "esnext",
-        "moduleResolution": "node",
-        "lib": [
-            "esnext",
-            "esnext.asynciterable",
-            "dom"
-        ],
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "allowJs": true,
-        "sourceMap": true,
-        "strict": true,
-        "noImplicitAny": false,
-        "noEmit": true,
-        "baseUrl": ".",
-        "paths": {
-            "~/*": [
-                "./src/*"
-            ]
-        },
-        "types": [
-            "@types/tween.js",
-        ]
-    },
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true
+  },
+  "include": ["src"]
 }
