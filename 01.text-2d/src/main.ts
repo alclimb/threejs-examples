@@ -25,6 +25,13 @@ export module utils {
   export function toRadian(degree: number) {
     return (Math.PI / 180) * degree;
   }
+
+  export async function loadFont() {
+    const loader = new FontLoader();
+    const font = await loader.loadAsync(`/fonts/helvetiker_regular.typeface.json`);
+
+    return font;
+  }
 }
 
 async function main(element: HTMLElement) {
@@ -81,10 +88,27 @@ async function main(element: HTMLElement) {
   //   this.scene.add(this.colorTextMesh);
   // }
 
+  const font = await utils.loadFont()
+
+  const matLite = new THREE.MeshBasicMaterial({
+    color: 0x006699,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.DoubleSide
+  });
+
+  const shapes = font.generateShapes(``, 100);
+  const geometry = new THREE.ShapeGeometry(shapes);
+  geometry.computeBoundingBox();
+  geometry.translate(0, 0, 0);
+  const colorTextMesh = new THREE.Mesh(geometry, matLite);
+  colorTextMesh.position.z = - 150;
+
   // シーンを初期化
   const scene = new THREE.Scene();
   scene.add(directionalLight);
   scene.add(ambientLight);
+  scene.add(colorTextMesh);
 
   // カメラを初期化
   const camera = new THREE.PerspectiveCamera(
@@ -129,7 +153,7 @@ async function main(element: HTMLElement) {
   window.addEventListener(`resize`, onWindowResize, false);
 
   animate();
-  
+
   function animate() {
     // Tween: 色の変更アニメーション
     {
@@ -143,6 +167,12 @@ async function main(element: HTMLElement) {
         // // テキストの色を変更
         // this.colorTextMesh.fillStyle = color.brighten(3.0).hex();
         // this.colorTextMesh.text = color.hex();
+
+        const shapes = font.generateShapes(color.hex(), 100);
+        const geometry = new THREE.ShapeGeometry(shapes);
+        geometry.computeBoundingBox();
+        geometry.translate(0, 0, 0);
+        colorTextMesh.geometry = geometry;
 
         // 背景を変更
         renderer.setClearColor(color.hex());
