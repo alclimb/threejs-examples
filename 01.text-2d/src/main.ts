@@ -1,124 +1,56 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import * as chroma from "chroma-js";
 import TWEEN from "@tweenjs/tween.js";
-
-/** ディープトーンのカラーリスト */
-const DEEP_TONE = [
-  chroma.hex(`#C7000B`),
-  chroma.hex(`#D28300`),
-  chroma.hex(`#DFD000`),
-  chroma.hex(`#7BAA17`),
-  chroma.hex(`#00873C`),
-  chroma.hex(`#008A83`),
-  chroma.hex(`#008DCB`),
-  chroma.hex(`#005AA0`),
-  chroma.hex(`#181878`),
-  chroma.hex(`#800073`),
-  chroma.hex(`#C6006F`),
-  chroma.hex(`#C70044`),
-];
-
-export module utils {
-  export function toRadian(degree: number) {
-    return (Math.PI / 180) * degree;
-  }
-
-  export async function loadFont() {
-    const loader = new FontLoader();
-    const font = await loader.loadAsync(`/fonts/droid_sans_mono_regular.typeface.json`);
-
-    return font;
-  }
-}
+import { TextMesh } from "./TextMesh";
 
 async function main(element: HTMLElement) {
-  const width = element.offsetWidth;
-  const height = element.offsetHeight;
+  /** ディープトーンのカラーリスト */
+  const DEEP_TONE = [
+    chroma.hex(`#C7000B`),
+    chroma.hex(`#D28300`),
+    chroma.hex(`#DFD000`),
+    chroma.hex(`#7BAA17`),
+    chroma.hex(`#00873C`),
+    chroma.hex(`#008A83`),
+    chroma.hex(`#008DCB`),
+    chroma.hex(`#005AA0`),
+    chroma.hex(`#181878`),
+    chroma.hex(`#800073`),
+    chroma.hex(`#C6006F`),
+    chroma.hex(`#C70044`),
+  ];
 
-  // ライト：平行光
-  const directionalLight = new THREE.DirectionalLight(0xffffff);
-  directionalLight.position.set(7, 10, -2);
-  directionalLight.color.set(0xffffff);
-  directionalLight.intensity = 0.3;
-  directionalLight.shadow.radius = 3.0;
-  directionalLight.castShadow = true; // ライトの影を有効
+  const DEGREE_90 = (Math.PI / 180) * 90;
 
-  // ライト：環境光
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+  const loader = new FontLoader();
+  const font = await loader.loadAsync(`/fonts/droid_sans_mono_regular.typeface.json`);
 
-  // 座標軸のセットアップ
-  const axes = new THREE.AxesHelper(25);
-
-  //   // 3Dテキストを追加
-  //   {
-  //     this.titleTextMesh = new MeshText2D(`100 DAYS OF CODE\nDAY 9`, {
-  //       align: textAlign.bottom,
-  //       font: `120px Arial`,
-  //       antialias: true,
-  //       shadowColor: `#909090`,
-  //       shadowBlur: 4,
-  //       shadowOffsetX: 2,
-  //       shadowOffsetY: 2,
-  //       lineHeight: 1.0,
-  //     });
-  //     this.titleTextMesh.position.set(0, 0, -0.3);
-  //     this.titleTextMesh.rotateX(utils.toRadian(-90));
-  //     this.titleTextMesh.scale.set(0.001, 0.001, 0.001);
-
-  //     // シーンに追加
-  //     this.scene.add(this.titleTextMesh);
-  //   }
-
-  // // 3Dテキストを追加
-  // {
-  //   this.colorTextMesh = new MeshText2D(``, {
-  //     align: textAlign.center,
-  //     font: `120px monospace`,
-  //     antialias: true,
-  //     shadowColor: `#909090`,
-  //     shadowBlur: 4,
-  //     shadowOffsetX: 2,
-  //     shadowOffsetY: 2,
-  //   });
-  //   this.colorTextMesh.position.set(0.0, 0, 0.0);
-  //   this.colorTextMesh.rotateX(utils.toRadian(-90));
-  //   this.colorTextMesh.scale.set(0.004, 0.004, 0.004);
-
-  //   // シーンに追加
-  //   this.scene.add(this.colorTextMesh);
-  // }
-
-  const font = await utils.loadFont()
-
-  const matLite = new THREE.MeshBasicMaterial({
-    color: 0x006699,
-    transparent: true,
-    //opacity: 0.4,
-    side: THREE.DoubleSide
+  const titleTextMesh = new TextMesh(font, {
+    text: `100 DAYS OF CODE\nDAY 9`,
+    translate: new THREE.Vector3(-50, 50, 0),
+    rotate: new THREE.Vector3(-DEGREE_90, 0, 0),
+    scale: new THREE.Vector3(0.004, 0.004, 0.004),
   });
 
-  const shapes = font.generateShapes(``, 120);
-  const geometry = new THREE.ShapeGeometry(shapes);
-  geometry.computeBoundingBox();
-  geometry.translate(0, 0, 0);
-  geometry.rotateX(utils.toRadian(-90));
-  geometry.scale(0.004, 0.004, 0.004);
-  const colorTextMesh = new THREE.Mesh(geometry, matLite);
+  const colorTextMesh = new TextMesh(font, {
+    size: 120,
+    height: 5,
+    translate: new THREE.Vector3(-340, -100, 0),
+    rotate: new THREE.Vector3(-DEGREE_90, 0, 0),
+    scale: new THREE.Vector3(0.002, 0.002, 0.002),
+  });
 
   // シーンを初期化
   const scene = new THREE.Scene();
-  scene.add(directionalLight);
-  scene.add(ambientLight);
-  //scene.add(axes);
+  scene.add(titleTextMesh);
   scene.add(colorTextMesh);
 
   // カメラを初期化
   const camera = new THREE.PerspectiveCamera(
     50,
-    width / height,
+    element.offsetWidth / element.offsetHeight,
     0.01,
     1000
   );
@@ -127,10 +59,8 @@ async function main(element: HTMLElement) {
 
   // レンダラーの初期化
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(width, height);
+  renderer.setSize(element.offsetWidth, element.offsetHeight);
   renderer.shadowMap.enabled = true; // レンダラー：シャドウを有効にする
-  // renderer.toneMapping = THREE.ReinhardToneMapping;
-  // renderer.toneMappingExposure = Math.pow(1.0, 4.0);
 
   // カメラコントローラー設定
   const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -140,8 +70,11 @@ async function main(element: HTMLElement) {
   orbitControls.autoRotate = false; // カメラの自動回転設定
   orbitControls.autoRotateSpeed = 1.0; // カメラの自動回転速度
 
-  // Windowサイズ変更イベントハンドラ
-  const onWindowResize = () => {
+  // DOMに追加
+  element.appendChild(renderer.domElement);
+
+  // DOMイベントの登録: Windowサイズ変更イベントハンドラ
+  window.addEventListener(`resize`, () => {
     const width = element.offsetWidth;
     const height = element.offsetHeight;
 
@@ -149,58 +82,29 @@ async function main(element: HTMLElement) {
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
-  }
-
-  // DOMに追加
-  element.appendChild(renderer.domElement);
-
-  // DOMイベントの登録
-  window.addEventListener(`resize`, onWindowResize, false);
+  }, false);
 
   animate();
 
   function animate() {
     // Tween: 色の変更アニメーション
     {
-      // アニメーション変化時の処理
-      const onUpdate = (val: number[]) => {
-        const color = chroma.rgb(val[0], val[1], val[2]);
-
-        // // テキストの色を変更
-        // this.titleTextMesh.fillStyle = color.darken(2.0).hex();
-
-        // // テキストの色を変更
-        // this.colorTextMesh.fillStyle = color.brighten(3.0).hex();
-        // this.colorTextMesh.text = color.hex();
-
-        const scale = 0.002;
-
-        const shapes = font.generateShapes(color.hex().toUpperCase(), 120);
-        const geometry = new THREE.ShapeGeometry(shapes);
-        geometry.computeBoundingBox();
-
-        //const xMid = -0.5 * (geometry.boundingBox!.max.x! - geometry.boundingBox!.min.x!);
-        //console.log(xMid);
-        //console.log(geometry.boundingBox!.max.x);
-        const xMid = -340;
-
-        geometry.translate(xMid, 0, 0);
-        geometry.scale(scale, scale, scale);
-        geometry.rotateX(utils.toRadian(-90));
-        colorTextMesh.geometry = geometry;
-
-        colorTextMesh.material.color.set(color.brighten(3.0).hex());
-
-        // 背景を変更
-        renderer.setClearColor(color.hex());
-      };
-
       // Tween: アニメーション生成
       const tweens = DEEP_TONE.map((color, i) => {
         return new TWEEN.Tween(color.rgb())
-          .to(DEEP_TONE[(i + 1) % DEEP_TONE.length].rgb(), 1000)
+          .to(DEEP_TONE[(i + 1) % DEEP_TONE.length].rgb(), 2000)
           .easing(TWEEN.Easing.Elastic.InOut)
-          .onUpdate(onUpdate);
+          .onUpdate((val: number[]) => {
+            const color = chroma.rgb(val[0], val[1], val[2]);
+
+            // テキストの文字と色を変更
+            colorTextMesh.text = color.hex().toUpperCase();
+            colorTextMesh.color = color.brighten(3.0).hex();
+            titleTextMesh.color = color.brighten(3.0).hex();
+
+            // 背景を変更
+            renderer.setClearColor(color.hex());
+          });
       });
 
       // Tween: アニメーションチェイン
