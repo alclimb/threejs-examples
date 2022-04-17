@@ -22,18 +22,24 @@ async function main(element: HTMLElement) {
     chroma.hex(`#C70044`),
   ];
 
+  /** 角度90°の定数 */
   const DEGREE_90 = (Math.PI / 180) * 90;
 
-  const loader = new FontLoader();
-  const font = await loader.loadAsync(`/fonts/droid_sans_mono_regular.typeface.json`);
+  // フォントローダー
+  const fontLoader = new FontLoader();
 
+  // フォントを読み込む
+  const font = await fontLoader.loadAsync(`/fonts/droid_sans_mono_regular.typeface.json`);
+
+  // テキストメッシュ: タイトル表示用テキスト
   const titleTextMesh = new TextMesh(font, {
-    text: `100 DAYS OF CODE\nDAY 9`,
-    translate: new THREE.Vector3(-50, 50, 0),
+    text: `[ TextGeometry Scene ]\nDEEP TONE COLOR ANIMATION`,
+    translate: new THREE.Vector3(-100, 50, 0),
     rotate: new THREE.Vector3(-DEGREE_90, 0, 0),
     scale: new THREE.Vector3(0.004, 0.004, 0.004),
   });
 
+  // テキストメッシュ: カラー表示用テキスト
   const colorTextMesh = new TextMesh(font, {
     size: 120,
     height: 5,
@@ -70,6 +76,36 @@ async function main(element: HTMLElement) {
   orbitControls.autoRotate = false; // カメラの自動回転設定
   orbitControls.autoRotateSpeed = 1.0; // カメラの自動回転速度
 
+  // Tween: 色の変更アニメーション
+  {
+    // Tween: アニメーション生成
+    const tweens = DEEP_TONE.map((color, i) => {
+      return new TWEEN.Tween(color.rgb())
+        .to(DEEP_TONE[(i + 1) % DEEP_TONE.length].rgb(), 2000)
+        .easing(TWEEN.Easing.Elastic.InOut)
+        .onUpdate((val: number[]) => {
+          const color = chroma.rgb(val[0], val[1], val[2]);
+
+          // テキストの文字と色を変更
+          colorTextMesh.text = color.hex().toUpperCase();
+          colorTextMesh.color = color.brighten(3.0).hex();
+          titleTextMesh.color = color.brighten(3.0).hex();
+
+          // 背景を変更
+          renderer.setClearColor(color.hex());
+        });
+    });
+
+    // Tween: アニメーション･チェイン
+    for (let i = 0; i < tweens.length; i++) {
+      const next = (i + 1) % tweens.length;
+      tweens[i].chain(tweens[next]);
+    }
+
+    // Tween: アニメーションスタート
+    tweens[0].start();
+  }
+
   // DOMに追加
   element.appendChild(renderer.domElement);
 
@@ -84,62 +120,32 @@ async function main(element: HTMLElement) {
     renderer.setSize(width, height);
   }, false);
 
-  animate();
+  // 最終更新時間
+  let lastTime = 0;
 
-  function animate() {
-    // Tween: 色の変更アニメーション
-    {
-      // Tween: アニメーション生成
-      const tweens = DEEP_TONE.map((color, i) => {
-        return new TWEEN.Tween(color.rgb())
-          .to(DEEP_TONE[(i + 1) % DEEP_TONE.length].rgb(), 2000)
-          .easing(TWEEN.Easing.Elastic.InOut)
-          .onUpdate((val: number[]) => {
-            const color = chroma.rgb(val[0], val[1], val[2]);
+  // 描画ループを開始
+  renderer.setAnimationLoop((time: number) => {
+    // deltaを算出
+    const delta = (time - lastTime) / 1000;
 
-            // テキストの文字と色を変更
-            colorTextMesh.text = color.hex().toUpperCase();
-            colorTextMesh.color = color.brighten(3.0).hex();
-            titleTextMesh.color = color.brighten(3.0).hex();
+    // Tween: アニメーション更新
+    TWEEN.update(time);
 
-            // 背景を変更
-            renderer.setClearColor(color.hex());
-          });
-      });
+    // カメラコントローラーを更新
+    orbitControls.update();
 
-      // Tween: アニメーションチェイン
-      for (let i = 0; i < tweens.length; i++) {
-        const next = (i + 1) % tweens.length;
-        tweens[i].chain(tweens[next]);
-      }
+    // 描画する
+    renderer.render(scene, camera);
 
-      // Tween: アニメーションスタート
-      tweens[0].start();
-    }
-
-    let lastTime = 0;
-
-    // アニメーションループを開始
-    renderer.setAnimationLoop((time: number) => {
-      // deltaを算出
-      const delta = (time - lastTime) / 1000;
-
-      // Tween: アニメーション更新
-      TWEEN.update(time);
-
-      // カメラコントローラーを更新
-      orbitControls.update();
-
-      // 描画する
-      renderer.render(scene, camera);
-
-      lastTime = time;
-    });
-  }
+    lastTime = time;
+  });
 }
 
-window.onload = function () {
+// ページロード完了イベント
+window.onload = async function () {
   // DOMを取得
   const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
-  main(appElement);
+
+  // メインプログラム開始
+  await main(appElement);
 }
