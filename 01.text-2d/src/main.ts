@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import { MeshText2D, textAlign } from "three-text2d";
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import * as chroma from "chroma-js";
 import TWEEN from "@tweenjs/tween.js";
 
@@ -28,7 +28,7 @@ export module utils {
 
   export async function loadFont() {
     const loader = new FontLoader();
-    const font = await loader.loadAsync(`/fonts/helvetiker_regular.typeface.json`);
+    const font = await loader.loadAsync(`/fonts/droid_sans_mono_regular.typeface.json`);
 
     return font;
   }
@@ -48,6 +48,9 @@ async function main(element: HTMLElement) {
 
   // ライト：環境光
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+
+  // 座標軸のセットアップ
+  const axes = new THREE.AxesHelper(25);
 
   //   // 3Dテキストを追加
   //   {
@@ -93,21 +96,23 @@ async function main(element: HTMLElement) {
   const matLite = new THREE.MeshBasicMaterial({
     color: 0x006699,
     transparent: true,
-    opacity: 0.4,
+    //opacity: 0.4,
     side: THREE.DoubleSide
   });
 
-  const shapes = font.generateShapes(``, 100);
+  const shapes = font.generateShapes(``, 120);
   const geometry = new THREE.ShapeGeometry(shapes);
   geometry.computeBoundingBox();
   geometry.translate(0, 0, 0);
+  geometry.rotateX(utils.toRadian(-90));
+  geometry.scale(0.004, 0.004, 0.004);
   const colorTextMesh = new THREE.Mesh(geometry, matLite);
-  colorTextMesh.position.z = - 150;
 
   // シーンを初期化
   const scene = new THREE.Scene();
   scene.add(directionalLight);
   scene.add(ambientLight);
+  //scene.add(axes);
   scene.add(colorTextMesh);
 
   // カメラを初期化
@@ -168,11 +173,23 @@ async function main(element: HTMLElement) {
         // this.colorTextMesh.fillStyle = color.brighten(3.0).hex();
         // this.colorTextMesh.text = color.hex();
 
-        const shapes = font.generateShapes(color.hex(), 100);
+        const scale = 0.002;
+
+        const shapes = font.generateShapes(color.hex().toUpperCase(), 120);
         const geometry = new THREE.ShapeGeometry(shapes);
         geometry.computeBoundingBox();
-        geometry.translate(0, 0, 0);
+
+        //const xMid = -0.5 * (geometry.boundingBox!.max.x! - geometry.boundingBox!.min.x!);
+        //console.log(xMid);
+        //console.log(geometry.boundingBox!.max.x);
+        const xMid = -340;
+
+        geometry.translate(xMid, 0, 0);
+        geometry.scale(scale, scale, scale);
+        geometry.rotateX(utils.toRadian(-90));
         colorTextMesh.geometry = geometry;
+
+        colorTextMesh.material.color.set(color.brighten(3.0).hex());
 
         // 背景を変更
         renderer.setClearColor(color.hex());
