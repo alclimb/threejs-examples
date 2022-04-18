@@ -2,16 +2,29 @@ import * as THREE from "three";
 import { Font } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
+/**
+ * テキストメッシュのパラメータ
+ */
 export type TextMeshOptions = {
+  /** 表示する文字列 */
   text?: string,
+  /** 表示するテキストのフォントサイズ */
   size?: number,
+  /** 厚み */
   height?: number,
+  /** 文字色 */
   color?: THREE.ColorRepresentation,
+  /** 位置座標 */
   translate?: THREE.Vector3,
+  /** 回転位置 */
   rotate?: THREE.Vector3,
+  /** 拡大縮小 */
   scale?: THREE.Vector3,
 };
 
+/**
+ * テキスト用のObject3Dを継承したメッシュクラス
+ */
 export class TextMesh extends THREE.Object3D {
   private _material = new THREE.MeshBasicMaterial();
   private _mesh = new THREE.Mesh(new THREE.ShapeGeometry(), this._material);
@@ -35,25 +48,34 @@ export class TextMesh extends THREE.Object3D {
     this._rotate = options?.rotate ?? new THREE.Vector3();
     this._scale = options?.scale ?? new THREE.Vector3(1, 1, 1);
 
-    // 
+    // テキストメッシュをパラメータに従って更新
     this.updateText();
 
-    // 
+    // メッシュをシーンに追加
     this.add(this._mesh);
   }
 
+  /** テキスト文字列を取得するプロパティ */
   get text() { return this._text; }
+
+  /** テキスト文字列を設定するプロパティ */
   set text(value: string) {
     this._text = value;
     this.updateText();
   }
 
+  /** 文字色を取得するプロパティ */
   get color() { return this._color; }
+
+  /** 文字色を設定するプロパティ */
   set color(value: THREE.ColorRepresentation) {
     this._color = value;
     this._material.color.set(this._color)
   }
 
+  /**
+   * テキストメッシュをパラメータに従って更新する
+   */
   private updateText() {
     const geometry = new TextGeometry(this._text, {
       font: this._font,
