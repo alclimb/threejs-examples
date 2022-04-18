@@ -5,6 +5,18 @@ import * as chroma from "chroma-js";
 import TWEEN from "@tweenjs/tween.js";
 import { TextMesh } from "./TextMesh";
 
+// ページロード完了イベント
+window.onload = async function () {
+  // DOMを取得
+  const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
+
+  // メインプログラム開始
+  await main(appElement);
+}
+
+/**
+ * メインプログラム
+ */
 async function main(element: HTMLElement) {
   /** ディープトーンのカラーリスト */
   const DEEP_TONE = [
@@ -106,20 +118,6 @@ async function main(element: HTMLElement) {
     tweens[0].start();
   }
 
-  // DOMに追加
-  element.appendChild(renderer.domElement);
-
-  // DOMイベントの登録: Windowサイズ変更イベントハンドラ
-  window.addEventListener(`resize`, () => {
-    const width = element.offsetWidth;
-    const height = element.offsetHeight;
-
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(width, height);
-  }, false);
-
   // 最終更新時間
   let lastTime = 0;
 
@@ -139,13 +137,22 @@ async function main(element: HTMLElement) {
 
     lastTime = time;
   });
-}
 
-// ページロード完了イベント
-window.onload = async function () {
-  // DOMを取得
-  const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
+  /// 
+  /// ブラウザーDOM操作
+  /// 
 
-  // メインプログラム開始
-  await main(appElement);
+  // DOMに追加
+  element.appendChild(renderer.domElement);
+
+  // DOMイベントの登録: Windowサイズ変更イベントハンドラ
+  window.addEventListener(`resize`, () => {
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+  }, false);
 }
