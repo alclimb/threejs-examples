@@ -8,14 +8,6 @@ window.onload = async function () {
   // DOMを取得
   const appElement = document.querySelector<HTMLElement>(`#myApp`)!;
 
-  // メインプログラム開始
-  await main(appElement);
-}
-
-/**
- * メインプログラム
- */
-async function main(element: HTMLElement) {
   // フォントローダー
   const fontLoader = new FontLoader();
 
@@ -25,9 +17,9 @@ async function main(element: HTMLElement) {
   // テキストメッシュ: タイトル表示用テキスト
   const titleTextMesh = new TextMesh(font, {
     text: `[ TextGeometry Scene ]\nDEEP TONE COLOR ANIMATION`,
-    translate: new THREE.Vector3(-100, 50, 0),
+    translate: new THREE.Vector3(-100, 10, 0),
     rotate: new THREE.Vector3(0, 0, 0),
-    scale: new THREE.Vector3(0.004, 0.004, 0.004),
+    scale: new THREE.Vector3(0.01, 0.01, 0.01),
   });
 
   // シーンを初期化
@@ -37,7 +29,7 @@ async function main(element: HTMLElement) {
   // カメラを初期化
   const camera = new THREE.PerspectiveCamera(
     50,
-    element.offsetWidth / element.offsetHeight,
+    appElement.offsetWidth / appElement.offsetHeight,
     0.01,
     1000
   );
@@ -46,13 +38,13 @@ async function main(element: HTMLElement) {
 
   // レンダラーの初期化
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(element.offsetWidth, element.offsetHeight);
+  renderer.setSize(appElement.offsetWidth, appElement.offsetHeight);
   renderer.shadowMap.enabled = true; // レンダラー：シャドウを有効にする
 
   // カメラコントローラー設定
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.maxPolarAngle = Math.PI * 0.5;
-  orbitControls.minDistance = 1;
+  orbitControls.minDistance = 0.1;
   orbitControls.maxDistance = 100;
   orbitControls.autoRotate = false; // カメラの自動回転設定
   orbitControls.autoRotateSpeed = 1.0; // カメラの自動回転速度
@@ -71,16 +63,5 @@ async function main(element: HTMLElement) {
   /// 
 
   // DOMに追加
-  element.appendChild(renderer.domElement);
-
-  // DOMイベントの登録: Windowサイズ変更イベントハンドラ
-  window.addEventListener(`resize`, () => {
-    const width = element.offsetWidth;
-    const height = element.offsetHeight;
-
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(width, height);
-  }, false);
+  appElement.appendChild(renderer.domElement);
 }
