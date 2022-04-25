@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { AxesHelper } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextMesh } from "./TextMesh";
@@ -24,7 +23,7 @@ window.onload = async function () {
   });
 
   // 座表軸
-  const axes = new AxesHelper();
+  const axes = new THREE.AxesHelper();
 
   // シーンを初期化
   const scene = new THREE.Scene();
