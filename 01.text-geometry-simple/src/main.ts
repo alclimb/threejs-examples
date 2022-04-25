@@ -54,7 +54,7 @@ window.onload = async function () {
   orbitControls.autoRotateSpeed = 1.0; // カメラの自動回転速度
 
   // 描画ループを開始
-  renderer.setAnimationLoop((time: number) => {
+  renderer.setAnimationLoop(time => {
     // カメラコントローラーを更新
     orbitControls.update();
 
