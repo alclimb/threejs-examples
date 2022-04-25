@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { AxesHelper } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextMesh } from "./TextMesh";
@@ -22,9 +23,13 @@ window.onload = async function () {
     scale: new THREE.Vector3(0.01, 0.01, 0.01),
   });
 
+  // 座表軸
+  const axes = new AxesHelper();
+
   // シーンを初期化
   const scene = new THREE.Scene();
   scene.add(titleTextMesh);
+  scene.add(axes);
 
   // カメラを初期化
   const camera = new THREE.PerspectiveCamera(
